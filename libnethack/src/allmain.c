@@ -640,13 +640,6 @@ just_reloaded_save:
                           &(struct nh_cmd_arg){.argtype = 0});
             neutral_turnstate_tasks();
 
-        } else if (!(cmdlist[cmdidx].flags & CMD_NOTIME) ||
-                   !(cmdlist[cmdidx].flags & CMD_INTERNAL)) {
-
-            flags.incomplete = FALSE;
-            flags.interrupted = FALSE;
-            flags.occupation = occ_none;
-
         }
 
         program_state.in_zero_time_command =
