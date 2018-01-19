@@ -1,5 +1,5 @@
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
-/* Last modified by Alex Smith, 2018-01-15 */
+/* Last modified by Fredrik Ljungdahl, 2018-01-19 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -614,6 +614,7 @@ just_reloaded_save:
 
         boolean save_incomplete = flags.incomplete;
         boolean save_interrupted = flags.interrupted;
+        int save_occupation = flags.occupation;
 
         if (cmdlist[cmdidx].flags & CMD_NOTIME &&
             !(cmdlist[cmdidx].flags & CMD_INTERNAL) &&
@@ -666,6 +667,7 @@ just_reloaded_save:
         if (command_from_user && program_state.followmode != FM_PLAY) {
             flags.incomplete = save_incomplete;
             flags.interrupted = save_interrupted;
+            flags.occupation = save_occupation;
         }
 
         program_state.in_zero_time_command = FALSE;
