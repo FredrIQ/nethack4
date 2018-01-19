@@ -1,5 +1,5 @@
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
-/* Last modified by Alex Smith, 2015-11-11 */
+/* Last modified by Fredrik Ljungdahl, 2018-01-19 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1808,6 +1808,9 @@ doeat(const struct nh_cmd_arg *arg)
               "If you can't breathe air, how can you consume solids?");
         return 0;
     }
+
+    otmp = NULL;
+
     /* In the case of a continued action, continue eating the existing object if
        we can; it must either be in inventory, or on the floor at our
        location. Otherwise, fall through to floorfood(), which will read an
@@ -1815,9 +1818,16 @@ doeat(const struct nh_cmd_arg *arg)
        special-case turnstate.continue_message because otherwise it would prompt
        every turn for floor items, and partially eat each item in a stack in
        inventory before finishing.) */
-    if (!turnstate.continue_message && obj_with_u(u.utracked[tos_food]))
-        otmp = u.utracked[tos_food];
-    else
+    if (!turnstate.continue_message) {
+        pline(msgc_actionok, "occupation: %d", flags.occupation);
+        if (flags.occupation == occ_food && obj_with_u(u.utracked[tos_food]))
+            otmp = u.utracked[tos_food];
+        else if (flags.occupation == occ_tin &&
+                 obj_with_u(u.utracked[tos_tin]))
+            otmp = u.utracked[tos_tin];
+    }
+
+    if (!otmp)
         otmp = floorfood("eat", arg);
     if (!otmp)
         return 0;
@@ -2255,13 +2265,13 @@ floorfood(const char *verb, const struct nh_cmd_arg *arg)
 
 eat_floorfood:
     if (feeding && metallivorous(youmonst.data)) {
-	/* Two passes:
-	 *
-	 * 1) Check if anything on the floor can be chosen and make it available
-	 *    from the object picking prompt.
-	 * 2) If the floor was chosen (,) from that prompt, go through again,
-	 *    this time asking for the specific floor option.
-	 */
+        /* Two passes:
+         *
+         * 1) Check if anything on the floor can be chosen and make it available
+         *    from the object picking prompt.
+         * 2) If the floor was chosen (,) from that prompt, go through again,
+         *    this time asking for the specific floor option.
+         */
 
         if (ttmp && ttmp->tseen && ttmp->ttyp == BEAR_TRAP) {
             if (!checking_can_floorfood) {
